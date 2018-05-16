@@ -1,0 +1,27 @@
+{
+  "name": "v1directory",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "x1debug": "DEBUG=v1directory:* nodemon ./bin/www",
+    "x2debug": "DEBUG=v1directory:* babel-node ./bin/www --presets es2015,stage-2",
+    "debug": "DEBUG=v1directory:* nodemon ./bin/www --exec babel-node --presets es2015,stage-2",
+    "start": "babel-node ./bin/www --presets es2015,stage-2"
+  },
+  "dependencies": {
+    "async": "^2.6.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "jade": "~1.11.0",
+    "knex": "^0.14.6",
+    "morgan": "~1.9.0",
+    "nodemon": "^1.17.4",
+    "serve-favicon": "~2.4.5",
+    "sqlite3": "^4.0.0"
+  }
+}
