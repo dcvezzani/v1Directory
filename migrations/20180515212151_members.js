@@ -13,6 +13,7 @@ exports.up = function(knex, Promise) {
   }).then(() =>
   knex.schema.createTable('families', function(t) {
       t.integer('id').unsigned().primary();
+      t.text('name').notNull();
       t.text('decription').nullable();
       t.timestamps;
   }));
