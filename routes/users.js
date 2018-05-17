@@ -12,18 +12,27 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.get('/lookup/:id', function(req, res, next) {
-  knex('families')
-  .innerJoin('members', 'families.id', 'members.family_id')
-  .where({'families.id': 3694966261})
-  .asCallback(function(err, rows) {
+// router.get('/lookup/:id', function(req, res, next) {
+//   knex('families')
+//   .innerJoin('members', 'families.id', 'members.family_id')
+//   .where({'families.id': 3694966261})
+//   .asCallback(function(err, rows) {
+//     if (err) return next(err);
+//     res.status(200);
+//     res.json({rows});
+//   });
+// });
+
+router.get('/index', function(req, res, next) {
+  fetchAllMembers ((err, rows) => {
     if (err) return next(err);
+
     res.status(200);
     res.json({rows});
   });
 });
 
-router.get('/index/:id', function(req, res, next) {
+router.post('/index/:id', function(req, res, next) {
   indexMembers (req.params.id, req.headers.ldscookie, (err, { json }) => {
     if (err) return next(err);
 
@@ -40,6 +49,15 @@ router.get('/fetch/:id', function(req, res, next) {
     res.json({json});
   });
 });
+
+export const fetchAllMembers = (callback) => {
+  knex('families')
+  .select()
+	.orderBy('name', 'asc')
+  .asCallback((err, rows) => {
+    callback(err, rows);
+  })
+};
 
 const indexMembers = (id, ldscookie, callback) => {
   let res = {}
@@ -68,7 +86,7 @@ const indexMembers = (id, ldscookie, callback) => {
   });
 }
 
-const fetchIndexFromLdsOrg = (id, ldscookie, callback) => {
+const xfetchIndexFromLdsOrg = (id, ldscookie, callback) => {
   fs.readFile('/Users/davidvezzani/Downloads/v1-member-index.json', function read(err, data) {
     // const rows = _.map(JSON.parse(data.toString()), row => {
     //   console.log({row});
@@ -79,7 +97,7 @@ const fetchIndexFromLdsOrg = (id, ldscookie, callback) => {
   });
 }
 
-const xfetchIndexFromLdsOrg = (id, ldscookie, callback) => {
+const fetchIndexFromLdsOrg = (id, ldscookie, callback) => {
   const cmd = `curl 'https://www.lds.org/directory/services/web/v3.0/mem/member-list/${id}' -H $'cookie: ${ldscookie}' -H 'accept-encoding: gzip, deflate, br' -H 'accept-language: en-US,en;q=0.9' -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36' -H 'accept: application/json, text/javascript, */*; q=0.01' -H 'referer: https://www.lds.org/directory/?lang=eng' -H 'authority: www.lds.org' -H 'x-requested-with: XMLHttpRequest' --compressed | jq 'map({headOfHouseIndividualId, coupleName})'`
 
   exec(cmd, (err, stdout, stderr) => {
@@ -100,7 +118,7 @@ const cacheIndex = (id, parsedJson, callback) => {
   rows.forEach(row => {
     knex.insert(row).into('families')
     .asCallback((err, row) => {
-      if (err.code === 'SQLITE_CONSTRAINT') err = null;
+      if (err && err.code === 'SQLITE_CONSTRAINT') err = null;
 
       cnt -= 1;
       if (cnt <= 0) callback(err, rows);
@@ -219,4 +237,4 @@ const fetchMemberFromLdsOrg = (id, ldscookie, callback) => {
   });
 };
 
-module.exports = router;
+export const users = router;

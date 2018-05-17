@@ -9,6 +9,7 @@ exports.up = function(knex, Promise) {
       t.string('phone').nullable();
       t.string('email').nullable();
       t.text('decription').nullable();
+      t.integer('dnc').unsigned();
       t.timestamps;
   }).then(() =>
   knex.schema.createTable('families', function(t) {
