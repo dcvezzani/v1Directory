@@ -1,5 +1,5 @@
 import socketIo from 'socket.io';
-import { fetchAllFamilies, fetchMembers } from './routes/users';
+import { fetchAllFamilies, fetchMembers, fetchAllFamiliesWithMembers } from './routes/users';
 
 const reportError = (client, err, msg) => {
 	client.emit('error', err, msg);
@@ -23,7 +23,14 @@ export const io = (server) => {
 				if (err) reportError(client, err);
 				client.emit('fetchAllFamilies:done', {json: {rows}, status: 200});
 			});
-			
+		});
+
+		client.on('fetchAllFamiliesWithMembers', function(data) {
+			console.log(`fetchAllFamiliesWithMembers:`, data, fetchAllFamiliesWithMembers);
+			fetchAllFamiliesWithMembers ((err, rows) => {
+				if (err) reportError(client, err);
+				client.emit('fetchAllFamiliesWithMembers:done', {json: {rows}, status: 200});
+			});
 		});
 
 		client.on('fetchMembers', function(data) {

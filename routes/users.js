@@ -32,6 +32,15 @@ router.get('/index', function(req, res, next) {
   });
 });
 
+router.get('/members', function(req, res, next) {
+  fetchAllFamiliesWithMembers ((err, rows) => {
+    if (err) return next(err);
+
+    res.status(200);
+    res.json({rows});
+  });
+});
+
 router.post('/index/:id', function(req, res, next) {
   indexMembers (req.params.id, req.headers.ldscookie, (err, { json }) => {
     if (err) return next(err);
@@ -50,12 +59,11 @@ router.get('/fetch/:id', function(req, res, next) {
   });
 });
 
-export const xfetchAllMembers = ({ family_id, ldscookie }, callback) => {
+export const fetchAllFamiliesWithMembers = (callback) => {
   knex('families')
 	.leftOuterJoin('members', 'members.family_id', 'families.id')
-	.select(['families.id', 'families.name', 'members.name as mname', 'members.phone', 'members.email'])
-	.whereRaw('families.id = ?', [family_id])
-	// .orderBy('name', 'asc')
+	.select('families.id', 'families.name', 'members.name as mname', 'members.address', 'members.phone', 'members.email')
+	.orderBy('families.name', 'asc')
   .asCallback((err, rows) => {
 	  console.log(rows)
     callback(err, rows);
