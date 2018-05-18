@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) {
 // });
 
 router.get('/index', function(req, res, next) {
-  fetchAllMembers ((err, rows) => {
+  fetchAllFamilies ((err, rows) => {
     if (err) return next(err);
 
     res.status(200);
@@ -42,7 +42,7 @@ router.post('/index/:id', function(req, res, next) {
 });
 
 router.get('/fetch/:id', function(req, res, next) {
-  fetchMember (req.params.id, req.headers.ldscookie, (err, { json }) => {
+  fetchAllMembers (req.params.id, req.headers.ldscookie, (err, { json }) => {
     if (err) return next(err);
 
     res.status(200);
@@ -50,10 +50,26 @@ router.get('/fetch/:id', function(req, res, next) {
   });
 });
 
-export const fetchAllMembers = (callback) => {
+export const xfetchAllMembers = ({ family_id, ldscookie }, callback) => {
   knex('families')
-  .select()
-	.orderBy('name', 'asc')
+	.leftOuterJoin('members', 'members.family_id', 'families.id')
+	.select(['families.id', 'families.name', 'members.name as mname', 'members.phone', 'members.email'])
+	.whereRaw('families.id = ?', [family_id])
+	// .orderBy('name', 'asc')
+  .asCallback((err, rows) => {
+	  console.log(rows)
+    callback(err, rows);
+  })
+};
+
+export const fetchAllFamilies = (callback) => {
+  knex('families')
+	.leftOuterJoin('members', 'members.family_id', 'families.id')
+	// .select(['families.id', 'families.name', 'members.name as mname', 'members.phone', 'members.email'])
+	.select(['families.id', 'families.name'])
+	.count('families.id as cnt')
+	.groupBy('families.id', 'families.name')
+	.orderBy('families.name', 'asc')
   .asCallback((err, rows) => {
     callback(err, rows);
   })
@@ -163,7 +179,7 @@ const cacheMember = (id, parsedJson, callback) => {
   });
 };
 
-export const fetchMember = (id, ldscookie, callback) => {
+export const fetchAllMembers = (id, ldscookie, callback) => {
   let res = {}
   const tasks = [
     (cb) => {
