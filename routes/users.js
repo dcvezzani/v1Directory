@@ -42,7 +42,7 @@ router.post('/index/:id', function(req, res, next) {
 });
 
 router.get('/fetch/:id', function(req, res, next) {
-  fetchAllMembers (req.params.id, req.headers.ldscookie, (err, { json }) => {
+  fetchMembers (req.params.id, req.headers.ldscookie, (err, { json }) => {
     if (err) return next(err);
 
     res.status(200);
@@ -179,7 +179,7 @@ const cacheMember = (id, parsedJson, callback) => {
   });
 };
 
-export const fetchAllMembers = (id, ldscookie, callback) => {
+export const fetchMembers = (id, ldscookie, callback) => {
   let res = {}
   const tasks = [
     (cb) => {

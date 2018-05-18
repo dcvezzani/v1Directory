@@ -1,5 +1,5 @@
 import socketIo from 'socket.io';
-import { fetchAllFamilies, fetchAllMembers } from './routes/users';
+import { fetchAllFamilies, fetchMembers } from './routes/users';
 
 const reportError = (client, err, msg) => {
 	client.emit('error', err, msg);
@@ -26,11 +26,11 @@ export const io = (server) => {
 			
 		});
 
-		client.on('fetchAllMembers', function(data) {
-			console.log(`fetchAllMembers:`, data, fetchAllMembers);
-			fetchAllMembers (data.family_id, data.ldscookie, (err, json) => {
+		client.on('fetchMembers', function(data) {
+			console.log(`fetchMembers:`, data, fetchMembers);
+			fetchMembers (data.family_id, data.ldscookie, (err, json) => {
 				if (err) reportError(client, err);
-				client.emit(`fetchAllMembers:done:${data.family_id}`, {...json, status: 200});
+				client.emit(`fetchMembers:done:${data.family_id}`, {...json, status: 200});
 			});
 			
 		});

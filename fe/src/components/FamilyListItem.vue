@@ -33,12 +33,12 @@ export default {
   methods: {
 		fetchMembers: function(){
 			console.log(this.family);
-			this.$socket.emit('fetchAllMembers', {family_id: this.family.id, ldscookie: this.$parent.$refs.ldscookie.value});
+			this.$socket.emit('fetchMembers', {family_id: this.family.id, ldscookie: this.$parent.$refs.ldscookie.value});
 		}
   },
 	mounted() {
-		this.$socket.on(`fetchAllMembers:done:${this.family.id}`, (data) => {
-	 	  console.log(`fetchAllMembers:done:${this.family.id}`, data);
+		this.$socket.on(`fetchMembers:done:${this.family.id}`, (data) => {
+	 	  console.log(`fetchMembers:done:${this.family.id}`, data);
 	 		if (data.status == 200) {
 	 			// this.families = data.json.rows;
 				this.cnt = Object.keys(data.json).length;
