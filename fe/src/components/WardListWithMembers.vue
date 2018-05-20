@@ -1,7 +1,7 @@
 <template>
   <div class="ward-list ward-list-with-members">
 		<ul class="family-list">
-			<FamilyListItemWithDetails v-for="(family, index) in families" :key="index" :family="family"></FamilyListItemWithDetails>
+			<FamilyListItemWithDetails v-for="(family, index) in families" :key="index" :family="family" view="hoh"></FamilyListItemWithDetails>
 		</ul>
   </div>
 </template>
@@ -25,7 +25,15 @@ export default {
 				this.families = data.json.rows;
 			}
     },
+    "fetchAllHohs:done": function(data){
+		  console.log('fetchAllHohs:done:', data);
+			if (data.status == 200) {
+				this.families = data.json.rows;
+			}
+    },
   },
+	methods: {
+	},
 	mounted() {
 		// this.$socket.on(`fetchMembers:done:${this.family.id}`, (data) => {
 	 	//   console.log(`fetchMembers:done:${this.family.id}`, data);
@@ -35,7 +43,7 @@ export default {
 	 	// 	}
 		// });
 
-		this.$socket.emit('fetchAllFamiliesWithMembers');
+		this.$socket.emit('fetchAllHohs');
 	
 	},
 }

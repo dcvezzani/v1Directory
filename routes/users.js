@@ -41,6 +41,15 @@ router.get('/members', function(req, res, next) {
   });
 });
 
+router.get('/hohs', function(req, res, next) {
+  fetchAllHohs ((err, rows) => {
+    if (err) return next(err);
+
+    res.status(200);
+    res.json({rows});
+  });
+});
+
 router.post('/index/:id', function(req, res, next) {
   indexMembers (req.params.id, req.headers.ldscookie, (err, { json }) => {
     if (err) return next(err);
@@ -58,6 +67,47 @@ router.get('/fetch/:id', function(req, res, next) {
     res.json({json});
   });
 });
+
+export const fetchAllHohs = (callback) => {
+
+  const qryWithoutMembers = knex('families')
+	.leftOuterJoin('members', 'members.family_id', 'families.id')
+	//.select('families.name', 'group_concat(members.phone) as phone', 'group_concat(members.email) as email')
+	.select('families.id', 'families.name')
+	.select(knex.raw('substr(families.name, 0, instr(families.name, ",")) as lastName'))
+	.select(knex.raw('NULL as phone'))
+	.select(knex.raw('NULL as email'))
+	.whereNull('members.type')
+	// console.log({sql1: qryWithoutMembers.toSQL()});
+	
+  const qryWithMembers = knex('families')
+	.leftOuterJoin('members', 'members.family_id', 'families.id')
+	//.select('families.name', 'group_concat(members.phone) as phone', 'group_concat(members.email) as email')
+	.select('families.id')
+	.select('families.name')
+	.select(knex.raw('substr(families.name, 0, instr(families.name, ",")) as lastName'))
+	// .select(knex.raw('group_concat(members.name, ";") as name'))
+	.select(knex.raw('group_concat(members.phone, ",") as phone'))
+	.select(knex.raw('group_concat(members.email, ",") as email'))
+	.whereIn('members.type', ['house', 'hoh'])
+	.groupBy('families.id')
+	// console.log({sql2: qryWithMembers.toSQL()});
+
+	const qry = knex.from(function() {
+		this.union(qryWithMembers)
+		.union(qryWithoutMembers)
+	})
+	.orderBy('name')
+		
+	// .orderBy(knex.raw('group_concat(members.name, ", ")'), 'asc')
+	// .orderBy('families.id', 'asc')
+	// console.log({sql3: qry.toSQL()});
+
+  qry.asCallback((err, rows) => {
+	  // console.log(rows)
+    callback(err, rows);
+  })
+};
 
 export const fetchAllFamiliesWithMembers = (callback) => {
   knex('families')
