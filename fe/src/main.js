@@ -11,6 +11,8 @@ Vue.use(VueSocketio, 'http://localhost:3000');
 
 Vue.config.productionTip = false
 
+window.Event = new Vue();
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -1,6 +1,9 @@
 <template>
 	<li class="family-list-item" v-if="view === 'hoh'">
-		{{ family.name }} : {{ family.lastName }}:{{ uniquePhone }}:{{ uniqueEmail }}
+		<div :class="cssFamilyDetails">
+			{{ family.name }} : {{ family.lastName }}:{{ uniquePhone }}:{{ uniqueEmail }}
+		</div>
+    <div :class="cssSelectButton"><a @click="selectFamily" href="#" class="button is-primary"> &gt; </a></div>
 	</li>
 	<li class="family-list-item" v-else>
 		{{ family.name }} : {{ family.id }} : {{ formattedPhone }} : {{ family.email }} : {{ family.address }}
@@ -16,6 +19,14 @@ export default {
   props: ['family', 'view'], 
   name: 'FamilyListItemWithDetails',
 	computed: {
+		cssSelectButton: function () {
+			let classNames = ['select-button'];
+			return (this.selected === true) ? [...classNames, 'select-button-selected'] : classNames;
+		},
+		cssFamilyDetails: function () {
+			let classNames = ['family-details'];
+			return (this.selected === true) ? [...classNames, 'family-details-selected'] : classNames;
+		},
 		uniqueEmail: function() {
 			if (!_.isEmpty(this.family.email)) {
 				// return _.uniq(this.family.email.split(/, */)).join(',');
@@ -49,9 +60,14 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
+			selected: false,
     }
   },
   methods: {
+		selectFamily: function() {
+			this.$parent.selectFamily(this.family.id);
+			// this.selected = true;
+		},
   },
 	mounted() {
 	},
@@ -60,4 +76,25 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+	.select-button {
+		float: right;
+	}
+
+	.family-details {
+		float: left;
+		width: 90%;
+	}
+
+	.family-details-selected {
+		float: right;
+	}
+	.select-button-selected {
+		float: left;
+	}
+	
+	.select-button a {
+		width: 10px;
+		height: 19px;
+		font-size: 8pt;
+	}
 </style>
