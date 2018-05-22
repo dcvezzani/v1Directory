@@ -78,7 +78,6 @@ export default {
 					console.log(self.$refs.filterAvailable.value)
 					this.filteredFamilies = _.filter(this.families, family => family.name.match(new RegExp(self.$refs.filterAvailable.value, 'i')));
 				}, 250)
-				// console.log(evt)
 			}
 			document.addEventListener("keyup", _filterHandler, false);
 			
